@@ -89,7 +89,7 @@ export const loginUser = async (req, res) => {
  * Refresh JWT tokens.
  * --- FIX: Returns user object along with the CSRF token ---
  */
-export const refreshToken = async (req, res) => {
+export const refreshToken = async (req, res) => { 
   
   const oldToken = req.cookies.refresh_token;
   if (!oldToken) {
@@ -150,16 +150,23 @@ export const logoutUser = async (req, res) => {
     try {
       await sql`DELETE FROM tokens WHERE token = ${token}`;
     } catch (err) {
-      console.error('Logout DB error:', err);
+      console.error("Logout DB error:", err);
     }
   }
 
-  res.clearCookie('access_token', { path: '/' });
-  res.clearCookie('refresh_token', { path: '/auth/refresh' });
-  res.clearCookie('_csrf', { path: '/' }); 
+  const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+  };
 
-  res.status(200).json({ message: 'Logged out successfully' });
+  res.clearCookie("access_token", { ...cookieOptions, path: "/" });
+  res.clearCookie("refresh_token", { ...cookieOptions, path: "/auth/refresh" });
+  res.clearCookie("_csrf", { ...cookieOptions, path: "/" });
+
+  res.status(200).json({ message: "Logged out successfully" });
 };
+
 
 /**
  * Redirect to Google OAuth consent page.
