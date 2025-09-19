@@ -17,8 +17,6 @@ const router = Router();
 // GOOGLE OAUTH ROUTES 
 router.get('/google', googleAuth);
 router.get('/google/callback', csrfProtection, googleCallback);
-
-
 router.get('/csrf-token', csrfProtection, getCsrfToken);
 router.post('/register', csrfProtection, registerUser);
 router.post('/login', csrfProtection, loginUser);
