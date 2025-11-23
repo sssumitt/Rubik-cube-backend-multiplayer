@@ -1,16 +1,17 @@
 // server.js
-import express      from 'express';
-import cors         from 'cors';
+import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
-import { Server }   from 'socket.io';
-import csurf        from 'csurf';
+import { Server } from 'socket.io';
+import csurf from 'csurf';
 
-import config         from './config/config.js';
-import authRoutes     from './routes/auth.js';
+import config from './config/config.js';
+import authRoutes from './routes/auth.js';
+import statsRoutes from './routes/stats.js';
 import protectedRoutes from './routes/protected.js';
-import { sql }        from './db.js';
-import initSockets     from './socket.js';
+import { sql } from './db.js';
+import initSockets from './socket.js';
 
 const app = express();
 const PORT = config.port || 5000;
@@ -46,8 +47,9 @@ app.use(
 // ----------------------
 // API routes
 // ----------------------
-app.use('/auth', authRoutes);
-app.use('/protected', protectedRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/protected', protectedRoutes);
 
 // ----------------------
 // Create HTTP server and attach Socket.io
