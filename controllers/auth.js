@@ -37,15 +37,15 @@ export const registerUser = async (req, res) => {
       VALUES (${username}, ${passwordHash})
       RETURNING id, username
     `;
-    
+
     const newUser = newUserRows[0];
 
     const { accessToken, refreshToken } = issueTokens(res, { id: newUser.id, username: newUser.username });
     await saveRefreshToken(refreshToken, newUser.id);
-   
-    res.status(201).json({ 
+
+    res.status(201).json({
       user: { id: newUser.id, username: newUser.username },
-      csrfToken: req.csrfToken() 
+      csrfToken: req.csrfToken()
     });
 
   } catch (err) {
@@ -68,14 +68,14 @@ export const loginUser = async (req, res) => {
     }
 
     const userPayload = { id: user.id, username: user.username };
-    
+
     const { accessToken, refreshToken } = issueTokens(res, userPayload);
     await saveRefreshToken(refreshToken, user.id);
 
     // The frontend needs both the user data and the CSRF token
-    res.json({ 
+    res.json({
       user: userPayload,
-      csrfToken: req.csrfToken() 
+      csrfToken: req.csrfToken()
     });
 
   } catch (err) {
@@ -89,8 +89,8 @@ export const loginUser = async (req, res) => {
  * Refresh JWT tokens.
  * --- FIX: Returns user object along with the CSRF token ---
  */
-export const refreshToken = async (req, res) => { 
-  
+export const refreshToken = async (req, res) => {
+
   const oldToken = req.cookies.refresh_token;
   if (!oldToken) {
     return res.status(401).json({ error: 'Missing refresh token' });
@@ -128,9 +128,9 @@ export const refreshToken = async (req, res) => {
     await saveRefreshToken(newRefresh, user.id);
 
     // The frontend needs both the user data and the new CSRF token
-    res.json({ 
+    res.json({
       user: userPayload,
-      csrfToken: req.csrfToken() 
+      csrfToken: req.csrfToken()
     });
 
   } catch (err) {
@@ -161,7 +161,7 @@ export const logoutUser = async (req, res) => {
   };
 
   res.clearCookie("access_token", { ...cookieOptions, path: "/" });
-  res.clearCookie("refresh_token", { ...cookieOptions, path: "/auth/refresh" });
+  res.clearCookie("refresh_token", { ...cookieOptions, path: "/api/auth/refresh" });
   res.clearCookie("_csrf", { ...cookieOptions, path: "/" });
 
   res.status(200).json({ message: "Logged out successfully" });
@@ -172,7 +172,7 @@ export const logoutUser = async (req, res) => {
  * Redirect to Google OAuth consent page.
  */
 export const googleAuth = (req, res) => {
-  res.redirect(getGoogleAuthURL());    
+  res.redirect(getGoogleAuthURL());
 };
 
 
@@ -206,7 +206,7 @@ export const googleCallback = async (req, res) => {
       `;
       user = newUserRows[0];
     }
-    
+
     // Issue tokens and cookies
     const userPayload = { id: user.id, username: user.username };
     const { refreshToken } = issueTokens(res, userPayload);
